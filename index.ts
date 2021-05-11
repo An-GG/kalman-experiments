@@ -18,12 +18,16 @@ ctx.fillRect(100,10,100,100);
 let plotdef = {
     xMin: 0,
     xMax: 100,
-    yMin: -100,
-    yMax: 100,
+    yMin: -10,
+    yMax: 10,
 
     steps: 1000,
     xStart: 0,
-    xEnd: 100
+    xEnd: 100,
+
+    dotsize: 2,
+    colors: ["red", "blue", "green", "black", "orange"]
+
 }
 
 
@@ -37,7 +41,10 @@ let datas : number[][] = [];
 
 // Plots X = 0 onwards
 function run() {
+    let dN = 0;
     for (let d of datas) {
+        let dotcolor = plotdef.colors[dN % plotdef.colors.length];
+        ctx.fillStyle = dotcolor;
         for (let i = 0; i < plotdef.steps; i++) {
             let cX = plotdef.xStart + (i * stepWidth);
             let x_pct = (cX - plotdef.xMin) / graphWidth;
@@ -49,9 +56,10 @@ function run() {
                 y: (1 - y_pct) * canvasH
             }
             
-            ctx.fillRect(p.x, p.y, 1, 1);
+            ctx.fillRect(p.x, p.y, plotdef.dotsize, plotdef.dotsize);
 
         }
+        dN++;
     }
 }
 
@@ -65,11 +73,27 @@ function add_func(fx: (a:number)=>number) {
     datas.push(plotting);
 }
 
+type plottable = (a:number)=>number;
 
 
-add_func((a:number) => {
-    return 10*Math.sin(a);
-});
+// function parameters
+let fp = {
+    random_width: 1 
+}
+
+let plot_funcs : {[name:string]:plottable} = {
+
+    source_true: (i)=>Math.sin(i),
+
+    measured: (i)=> plot_funcs.source_true(i) + ((Math.random() * fp.random_width) - (fp.random_width / 2)),
+
+}
+
+
+// Add them all in the end
+for (let fname in plot_funcs) {
+    add_func(plot_funcs[fname]);
+}
 
 
 run();
