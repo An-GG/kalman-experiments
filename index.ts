@@ -27,6 +27,7 @@ let plotdef = {
 }
 
 
+
 let plottingWidth = plotdef.xEnd - plotdef.xStart;
 let stepWidth = plottingWidth / plotdef.steps;
 
