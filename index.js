@@ -12,12 +12,12 @@ init();
 ctx.fillRect(100, 10, 100, 100);
 var plotdef = {
     xMin: 0,
-    xMax: 1000,
+    xMax: 100,
     yMin: -100,
     yMax: 100,
     steps: 1000,
     xStart: 0,
-    xEnd: 1000
+    xEnd: 100
 };
 var plottingWidth = plotdef.xEnd - plotdef.xStart;
 var stepWidth = plottingWidth / plotdef.steps;
@@ -41,9 +41,15 @@ function run() {
         }
     }
 }
-var wave = [];
-for (var i = 0; i < plotdef.steps; i++) {
-    wave.push(Math.sin(i / 15) * 10);
+function add_func(fx) {
+    var plotting = [];
+    for (var i = 0; i < plotdef.steps; i++) {
+        var cX = plotdef.xStart + (i * stepWidth);
+        plotting.push(fx(cX));
+    }
+    datas.push(plotting);
 }
-datas.push(wave);
+add_func(function (a) {
+    return 10 * Math.sin(a);
+});
 run();

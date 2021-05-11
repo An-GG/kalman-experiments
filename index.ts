@@ -17,13 +17,13 @@ ctx.fillRect(100,10,100,100);
 
 let plotdef = {
     xMin: 0,
-    xMax: 1000,
+    xMax: 100,
     yMin: -100,
     yMax: 100,
 
     steps: 1000,
     xStart: 0,
-    xEnd: 1000
+    xEnd: 100
 }
 
 
@@ -54,12 +54,21 @@ function run() {
     }
 }
 
-let wave = [];
-for (let i = 0; i < plotdef.steps; i++) {
-    wave.push(Math.sin(i / 15) * 10);
+
+function add_func(fx: (a:number)=>number) {
+    let plotting = [];
+    for (let i = 0; i < plotdef.steps; i++) {
+        let cX = plotdef.xStart + (i * stepWidth);
+        plotting.push(fx(cX));
+    }
+    datas.push(plotting);
 }
 
-datas.push(wave);
+
+
+add_func((a:number) => {
+    return 10*Math.sin(a);
+});
 
 
 run();
