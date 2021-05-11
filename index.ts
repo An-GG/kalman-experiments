@@ -17,17 +17,17 @@ ctx.fillRect(100,10,100,100);
 
 let plotdef = {
     xMin: 0,
-    xMax: 100,
-    yMin: -10,
-    yMax: 10,
+    xMax: 50,
+    yMin: -3,
+    yMax: 3,
 
-    steps: 1000,
+    steps: 3000,
     xStart: 0,
-    xEnd: 100,
+    xEnd: 50,
 
     dotsize: 2,
-    colors: ["red", "blue", "green", "black", "orange"]
-
+    colors: ["red", "blue", "green", "black", "orange"],
+    enabled: [1, 0, 1]
 }
 
 
@@ -43,6 +43,7 @@ let datas : number[][] = [];
 function run() {
     let dN = 0;
     for (let d of datas) {
+
         let dotcolor = plotdef.colors[dN % plotdef.colors.length];
         ctx.fillStyle = dotcolor;
         for (let i = 0; i < plotdef.steps; i++) {
@@ -55,8 +56,9 @@ function run() {
                 x: x_pct * canvasW,
                 y: (1 - y_pct) * canvasH
             }
-            
-            ctx.fillRect(p.x, p.y, plotdef.dotsize, plotdef.dotsize);
+            if (plotdef.enabled[dN % plotdef.enabled.length]) {
+                ctx.fillRect(p.x, p.y, plotdef.dotsize, plotdef.dotsize);
+            }
 
         }
         dN++;
@@ -73,22 +75,40 @@ function add_func(fx: (a:number)=>number) {
     datas.push(plotting);
 }
 
+function xAt(stepN: number):number {
+    return plotdef.xStart + (stepN * stepWidth);
+}
+function iAt(xVal: number):number {
+    return (xVal - plotdef.xStart) / stepWidth;
+}
+
+
+
+
+
+
+
+
 type plottable = (a:number)=>number;
 
 
 // function parameters
 let fp = {
-    random_width: 1 
+    random_width: 1,
+    runningavg_width: 5
 }
 
+
+
+// Easily defined funcs to plot
+// The input is NOT the array index, it is arbitrary float 
 let plot_funcs : {[name:string]:plottable} = {
 
     source_true: (i)=>Math.sin(i),
 
-    measured: (i)=> plot_funcs.source_true(i) + ((Math.random() * fp.random_width) - (fp.random_width / 2)),
+    sensor: (i)=> plot_funcs.source_true(i) + ((Math.random() * fp.random_width) - (fp.random_width / 2)),
 
 }
-
 
 // Add them all in the end
 for (let fname in plot_funcs) {
@@ -96,7 +116,23 @@ for (let fname in plot_funcs) {
 }
 
 
-run();
 
+let running_avg_data = [];
+for (let i = 0; i < plotdef.steps; i++) {
+
+    if (!(i < plotdef.steps - fp.runningavg_width)) { running_avg_data.push(0); continue; }
+
+    let sum = 0;
+    for (let i2 = i; i2 < i + fp.runningavg_width; i2++) {
+        sum+=datas[1][i2];
+    }
+    running_avg_data.push(sum/fp.runningavg_width);
+}
+datas.push(running_avg_data);
+
+
+
+
+run();
 
 
